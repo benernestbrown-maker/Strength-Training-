@@ -9,7 +9,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Strength">
-<title>Strength Training</title>
+<title>Strength</title>
+
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -679,7 +682,7 @@ button{
   <header class="top">
     <button class="hamb" id="open">☰</button>
     <div class="brand">Strength</div>
-    <div class="local">LOCAL</div>
+    <div style="width:44px"></div>
   </header>
 
   <section class="view active" id="today">
@@ -702,7 +705,7 @@ button{
         <div class="grid3">
           <div class="stat"><b id="doneCount">0</b><span>Done</span></div>
           <div class="stat"><b id="blockCount">2</b><span>Blocks</span></div>
-          <div class="stat"><b id="actCount">0/7</b><span>Daily</span></div>
+          <div class="stat"><b id="actCount">0/8</b><span>Daily</span></div>
         </div>
 
         <div class="actions">
@@ -985,7 +988,7 @@ function renderHome(){
   document.getElementById('timePill').textContent=p.mins;
   document.getElementById('doneCount').textContent=state.history.length;
   document.getElementById('blockCount').textContent=p.blocks.length;
-  document.getElementById('actCount').textContent=`${dailyDone()}/7`;
+  document.getElementById('actCount').textContent=`${dailyDone()}/8`;
 
   let list=document.getElementById('blockList');
   list.innerHTML='';
