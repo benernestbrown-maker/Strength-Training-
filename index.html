@@ -641,6 +641,14 @@ button{
   transform:translateX(-50%) translateY(0);
 }
 
+
+.progressCard{display:flex;align-items:center;gap:18px;margin-bottom:14px}
+.progressRing{width:88px;height:88px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--blue) 0deg,#1b2430 0deg)}
+.progressRingInner{width:68px;height:68px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-family:var(--head);font-weight:800}
+.categoryTag{display:inline-block;margin-top:5px;padding:4px 8px;border-radius:999px;background:var(--blueSoft);border:1px solid var(--blueLine);color:var(--blueText);font-size:11px;font-weight:800}
+.completeBanner{display:none;padding:14px;border-radius:20px;margin-bottom:12px;background:rgba(69,212,131,.12);border:1px solid rgba(69,212,131,.4);color:#bff3d2;font-weight:800}
+.completeBanner.show{display:block}
+
 @media(max-width:390px){
   .hero h1{font-size:32px}
   .setrow{grid-template-columns:36px 1fr 1fr;gap:7px}
@@ -711,7 +719,7 @@ button{
         <div class="row">
           <div>
             <div class="title">Daily resilience</div>
-            <div class="small">No equipment · glute med, single-leg control and core · under 10 mins</div>
+            <div class="small">No equipment · glute med, hip stability, core control and running resilience · around 10 minutes</div>
           </div>
           <div class="pill">≤10 MIN</div>
         </div>
@@ -746,11 +754,16 @@ button{
     <div class="hero">
       <div class="eyebrow">DAILY</div>
       <h1>Resilience</h1>
-      <div class="sub">No equipment. Tick each item as you go. This resets each day.</div>
+      <div class="sub">No equipment. Tick each item as you go. Built around glute med activation, hip stability, core control and running resilience.</div>
     </div>
-    <section class="card">
-      <div class="activation" id="fullAct"></div>
-    </section>
+    <div class="completeBanner" id="completeBanner">Daily resilience complete ✓</div>
+<section class="card">
+<div class="progressCard">
+<div class="progressRing" id="progressRing"><div class="progressRingInner"><span id="progressText">0/8</span></div></div>
+<div><div class="title">Daily Progress</div><div class="small" id="timeRemaining">About 10 mins remaining</div></div>
+</div>
+<div class="activation" id="fullAct"></div>
+</section>
   </section>
 
   <section class="view" id="history">
@@ -821,12 +834,13 @@ const KEY='bb_strength_superset_v3';
 const weightsDefault=[4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42];
 
 const activation=[
-  ['Single Leg Reach','5 reps per side','Glute med + foot control','Reach slowly, keep hips level'],
-  ['Single Leg Sit To Stand','8 reps per side','Single-leg strength','Control the descent, no collapsing knee'],
-  ['Bird Dog','8 reps per side','Anti-rotation core','Pause briefly at full reach'],
+  ['Glute Med Wall Lean','2 sets × 30 seconds per side','Glute med activation','Push outside knee firmly into wall, keep pelvis level'],
   ['Side Plank','30 seconds per side','Glute med + obliques','Straight line from shoulder to ankle'],
+  ['Bird Dog','8 reps per side','Anti-rotation core','Pause briefly at full reach'],
   ['Dead Bug','8 reps per side','Anterior core control','Lower back stays flat'],
   ['Bear Plank Shoulder Tap','10 taps per side','Anti-rotation stability','Minimise hip movement'],
+  ['Single Leg Reach','5 reps per side','Glute med + foot control','Reach slowly, keep hips level'],
+  ['Single Leg Sit To Stand','8 reps per side','Single-leg strength','Control the descent, no collapsing knee'],
   ['Single Leg Calf Raise','15 reps per side','Running stiffness','Full range, controlled lowering']
 ];
 
@@ -940,10 +954,11 @@ function renderActivation(container){
   let d=state.daily[today()]||{};
   let el=document.getElementById(container);
   el.innerHTML='';
+  let done=activation.filter((_,i)=>d[i]).length;
   activation.forEach((a,i)=>{
     let row=document.createElement('div');
     row.className='act '+(d[i]?'done':'');
-    row.innerHTML=`<div class="check">✓</div><div><b>${a[0]}</b><em>${a[1]} · ${a[2]}</em><em>${a[3]}</em></div><div class="time">${d[i]?'Done':''}</div>`;
+    row.innerHTML=`<div class="check">✓</div><div><b>${a[0]}</b><div class="categoryTag">${a[2]}</div><em>${a[1]}</em><em>${a[3]}</em></div><div class="time">${d[i]?'✓':''}</div>`;
     row.onclick=()=>{
       state.daily[today()]=state.daily[today()]||{};
       state.daily[today()][i]=!state.daily[today()][i];
@@ -951,6 +966,14 @@ function renderActivation(container){
     };
     el.appendChild(row);
   });
+  const ring=document.getElementById('progressRing');
+  if(ring){
+    const deg=(done/8)*360;
+    ring.style.background=`conic-gradient(var(--blue) ${deg}deg,#1b2430 ${deg}deg)`;
+    document.getElementById('progressText').textContent=`${done}/8`;
+    document.getElementById('timeRemaining').textContent=done===8?'Completed':`About ${Math.max(1,8-done)} mins remaining`;
+    document.getElementById('completeBanner').classList.toggle('show',done===8);
+  }
 }
 
 function currentPlan(){return plans[state.next%plans.length]}
@@ -1128,7 +1151,7 @@ function renderHistory(){
 function renderProgress(){
   document.getElementById('pSessions').textContent=state.history.length;
   document.getElementById('pSets').textContent=state.history.reduce((a,w)=>a+w.blocks.reduce((b,bl)=>b+bl.moves.reduce((c,m)=>c+m.sets.length,0),0),0);
-  document.getElementById('pDaily').textContent=Object.values(state.daily).filter(d=>Object.values(d).filter(Boolean).length===7).length;
+  document.getElementById('pDaily').textContent=Object.values(state.daily).filter(d=>Object.values(d).filter(Boolean).length===8).length;
   let b=document.getElementById('bestList');
   b.innerHTML='';
   let ps=Object.entries(state.prs);
